@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kassi — Игра в магазин для детей</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f6f2;
+      --card: #ffffff;
+      --text: #2d2a26;
+      --text-muted: #6b6560;
+      --accent: #e67e22;
+      --accent-hover: #d35400;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Manrope', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .lang-switch {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      gap: 8px;
+    }
+
+    .lang-switch button {
+      padding: 8px 16px;
+      border: 2px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+
+    .lang-switch button:hover,
+    .lang-switch button.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .lang-switch button.active {
+      cursor: default;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .app-icon {
+      width: 120px;
+      height: 120px;
+      border-radius: 26px;
+      margin: 0 auto 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .app-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .app-store-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 28px;
+      background: var(--text);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+
+    .app-store-btn:hover {
+      background: var(--accent);
+    }
+
+    .app-store-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .section {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .section p, .section ul {
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .section ul {
+      padding-left: 24px;
+    }
+
+    .section li {
+      margin-bottom: 8px;
+    }
+
+    .screenshots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .screenshot {
+      aspect-ratio: 9/16;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #e8e4e0 0%, #f5f3f0 100%);
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .screenshot img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .screenshot-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: var(--bg);
+      border-radius: 12px;
+      font-size: 0.95rem;
+    }
+
+    .badge strong {
+      color: var(--text);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-switch">
+    <button class="lang-btn active" data-lang="ru">RU</button>
+    <button class="lang-btn" data-lang="en">EN</button>
+  </div>
+
+  <div class="content">
+    <header class="hero">
+      <div class="app-icon">
+        <img src="screenshots/AppIcon-1024.png" alt="Kassi">
+      </div>
+      <h1>Kassi</h1>
+      <p class="subtitle" data-ru="Игра в магазин для детей" data-en="Shop game for kids">Игра в магазин для детей</p>
+      <!-- Замените id на реальный App ID после публикации в App Store -->
+      <a href="https://apps.apple.com/app/kassi/id" class="app-store-btn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <span data-ru="Скачать в App Store" data-en="Download on the App Store">Скачать в App Store</span>
+      </a>
+    </header>
+
+    <!-- RU -->
+    <div id="lang-ru">
+      <section class="section">
+        <h2>О приложении</h2>
+        <p><strong>Kassi</strong> — детская игра в магазин с настоящим сканером штрихкодов. Смартфон превращается в игрушечный магазин: ребёнок сканирует штрихкоды, добавляет товары в корзину и «расплачивается». Всё работает офлайн, без интернета и рекламы.</p>
+      </section>
+
+      <section class="section">
+        <h2>Как это работает</h2>
+        <ul>
+          <li><strong>Сканирование</strong> — наведите камеру на штрихкод (EAN, UPC, Code 128, QR) и нажмите кнопку. Приложение найдёт товар в вашем каталоге или предложит его добавить.</li>
+          <li><strong>Свой каталог</strong> — создавайте товары с названием, ценой и картинкой (фото или эмодзи). Штрихкод можно ввести вручную или отсканировать.</li>
+          <li><strong>Корзина</strong> — добавляйте товары, меняйте количество и смотрите итоговую сумму. Анимации «Оплата» и «Очистить корзину» делают игру наглядной и понятной.</li>
+          <li><strong>Без интернета</strong> — каталог и корзина хранятся только на устройстве. Никаких аккаунтов и облака.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>Для кого</h2>
+        <p>Для детей, которые любят играть в магазин, и родителей, которые хотят безопасное приложение без рекламы и покупок внутри приложения.</p>
+      </section>
+
+      <section class="section">
+        <h2>Скриншоты</h2>
+        <div class="screenshots">
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-start.png" alt="Скриншот 1" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Скриншот 1</div>'">
+          </div>
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-3btn.png" alt="Скриншот 2" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Скриншот 2</div>'">
+          </div>
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-product.png" alt="Скриншот 3" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Скриншот 3</div>'">
+          </div>
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-code-prod.png" alt="Скриншот 4" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Скриншот 4</div>'">
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Требования</h2>
+        <div class="badges">
+          <div class="badge"><strong>iOS 15+</strong> iPhone или iPad</div>
+          <div class="badge"><strong>4+</strong> Рекомендуемый возраст</div>
+          <div class="badge"><strong>Офлайн</strong> Работает без интернета</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- EN -->
+    <div id="lang-en" class="hidden">
+      <section class="section">
+        <h2>About</h2>
+        <p><strong>Kassi</strong> is a kids' shop game with a real barcode scanner. Your iPhone or iPad becomes a toy store: kids scan barcodes, add items to the cart, and «pay». Everything works offline, with no internet or ads.</p>
+      </section>
+
+      <section class="section">
+        <h2>How it works</h2>
+        <ul>
+          <li><strong>Scanning</strong> — point the camera at a barcode (EAN, UPC, Code 128, QR) and tap the button. The app finds the product in your catalog or suggests adding it.</li>
+          <li><strong>Your catalog</strong> — create products with name, price, and image (photo or emoji). Enter the barcode manually or scan it.</li>
+          <li><strong>Cart</strong> — add items, change quantities, and see the total. «Payment» and «Clear cart» animations make the game clear and fun.</li>
+          <li><strong>Offline</strong> — catalog and cart are stored only on your device. No accounts or cloud.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>For whom</h2>
+        <p>For kids who love playing shop, and parents who want a safe app with no ads or in-app purchases.</p>
+      </section>
+
+      <section class="section">
+        <h2>Screenshots</h2>
+        <div class="screenshots">
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-start.png" alt="Screenshot 1" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Screenshot 1</div>'">
+          </div>
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-3btn.png" alt="Screenshot 2" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Screenshot 2</div>'">
+          </div>
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-product.png" alt="Screenshot 3" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Screenshot 3</div>'">
+          </div>
+          <div class="screenshot">
+            <img src="screenshots/Kassi-iphone-code-prod.png" alt="Screenshot 4" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'>Screenshot 4</div>'">
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Requirements</h2>
+        <div class="badges">
+          <div class="badge"><strong>iOS 15+</strong> iPhone or iPad</div>
+          <div class="badge"><strong>4+</strong> Recommended age</div>
+          <div class="badge"><strong>Offline</strong> Works without internet</div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>&copy; Kassi. <span data-ru="Игра в магазин с настоящим сканером штрихкодов." data-en="Shop game with a real barcode scanner.">Игра в магазин с настоящим сканером штрихкодов.</span></p>
+      <p><a href="mailto:aistweb@gmail.com">aistweb@gmail.com</a></p>
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.lang;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.getElementById('lang-ru').classList.toggle('hidden', lang !== 'ru');
+        document.getElementById('lang-en').classList.toggle('hidden', lang !== 'en');
+
+        document.querySelectorAll('[data-ru][data-en]').forEach(el => {
+          el.textContent = el.dataset[lang];
+        });
+
+        document.documentElement.lang = lang === 'ru' ? 'ru' : 'en';
+      });
+    });
+  </script>
+</body>
+</html>
