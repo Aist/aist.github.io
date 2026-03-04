@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Карусель для Instagram</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: var(--tg-theme-bg-color, #ffffff);
+      --bg2: var(--tg-theme-secondary-bg-color, #f5f5f5);
+      --text: var(--tg-theme-text-color, #222222);
+      --hint: var(--tg-theme-hint-color, #999999);
+      --link: var(--tg-theme-link-color, #2481cc);
+      --btn: var(--tg-theme-button-color, #2481cc);
+      --btn-text: var(--tg-theme-button-text-color, #ffffff);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overscroll-behavior: none;
+    }
+    .screen { display: none; flex-direction: column; min-height: 100vh; padding: 16px; }
+    .screen.active { display: flex; }
+    .header { text-align: center; padding: 24px 0 20px; }
+    .header .icon { font-size: 48px; margin-bottom: 8px; }
+    .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .header p { font-size: 14px; color: var(--hint); line-height: 1.4; }
+    .steps { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bg2); transition: all 0.3s; }
+    .step-dot.active { background: var(--btn); width: 24px; border-radius: 4px; }
+    .step-dot.done { background: var(--btn); }
+    .label { font-size: 13px; font-weight: 600; color: var(--hint); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    textarea {
+      width: 100%; background: var(--bg2); border: none; border-radius: 12px;
+      padding: 14px; font-size: 15px; color: var(--text); resize: none; outline: none;
+      line-height: 1.5; font-family: inherit;
+    }
+    textarea::placeholder { color: var(--hint); }
+    textarea:focus { box-shadow: 0 0 0 2px var(--btn); }
+    .phrases-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .phrase-item {
+      display: flex; align-items: center; gap: 10px; background: var(--bg2);
+      border-radius: 12px; padding: 4px 4px 4px 12px;
+    }
+    .phrase-item:focus-within { box-shadow: 0 0 0 2px var(--btn); }
+    .phrase-number { font-size: 12px; font-weight: 700; color: var(--hint); min-width: 18px; }
+    .phrase-input {
+      flex: 1; background: none; border: none; font-size: 15px; color: var(--text);
+      outline: none; padding: 10px 0; font-family: inherit;
+    }
+    .phrase-del {
+      width: 32px; height: 32px; border-radius: 8px; border: none;
+      background: transparent; color: var(--hint); cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .add-phrase-btn {
+      display: flex; align-items: center; gap: 8px; background: none;
+      border: 2px dashed var(--bg2); border-radius: 12px; padding: 12px 14px;
+      font-size: 14px; color: var(--hint); cursor: pointer; width: 100%; font-family: inherit;
+    }
+    .btn {
+      width: 100%; padding: 16px; border-radius: 14px; border: none;
+      font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--btn); color: var(--btn-text); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: var(--bg2); color: var(--text); }
+    .btn-gradient { background: linear-gradient(135deg, #E91E8C, #2481cc); color: white; }
+    .loading-screen {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 70vh; gap: 20px;
+    }
+    .spinner {
+      width: 56px; height: 56px; border: 4px solid var(--bg2);
+      border-top-color: var(--btn); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .progress-track { width: 200px; height: 4px; background: var(--bg2); border-radius: 2px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #E91E8C, #2481cc); border-radius: 2px; transition: width 0.5s ease; }
+    .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .gallery-item { aspect-ratio: 1; border-radius: 12px; overflow: hidden; position: relative; background: var(--bg2); cursor: pointer; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-item.final-slide { grid-column: span 2; aspect-ratio: 2/1; }
+    .phrase-label {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 8px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      color: white; font-size: 11px; font-weight: 600; line-height: 1.3;
+    }
+    .error-box {
+      background: #FFF3F3; border: 1px solid #FFCDD2; border-radius: 12px;
+      padding: 14px; color: #C62828; font-size: 14px; margin-top: 12px;
+    }
+    .info-box {
+      background: var(--bg2); border-radius: 12px; padding: 12px 14px;
+      font-size: 13px; color: var(--hint); margin-bottom: 16px; line-height: 1.5;
+    }
+    .final-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(36,129,204,0.1); border: 1px solid rgba(36,129,204,0.3);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 12px; font-weight: 600; color: var(--link); margin-bottom: 12px;
+    }
+    .mt-auto { margin-top: auto; }
+    .mt-16 { margin-top: 16px; }
+    .mt-8 { margin-top: 8px; }
+    .download-all-btn {
+      background: linear-gradient(135deg, #E91E8C, #2481cc); color: white;
+      padding: 16px; border-radius: 14px; border: none; font-size: 16px;
+      font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 10px; font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Screen 1: Text Input -->
+<div id="screen-text" class="screen active">
+  <div class="header">
+    <div class="icon">✍️</div>
+    <h1>Текст поста</h1>
+    <p>Вставьте текст вашего поста — мы извлечём ключевые идеи для карусели</p>
+  </div>
+  <div class="steps">
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="label">Текст поста</div>
+  <textarea id="post-text" rows="8" placeholder="Вставьте сюда текст вашего поста в Instagram..."></textarea>
+  <div id="char-count" style="font-size:12px;color:var(--hint);text-align:right;margin-top:8px;">0 символов</div>
+  <div id="text-error" class="error-box" style="display:none;"></div>
+  <div class="mt-auto mt-16">
+    <button class="btn btn-primary" id="extract-btn" onclick="extractIdeas()">Извлечь идеи →</button>
+  </div>
+</div>
+
+<!-- Screen 2: Loading ideas -->
+<div id="screen-loading-extract" class="screen">
+  <div class="loading-screen">
+    <div class="spinner"></div>
+    <div style="text-align:center;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Анализируем текст</div>
+      <div style="font-size:14px;color:var(--hint);">ChatGPT выбирает ключевые идеи...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 3: Phrases editing -->
+<div id="screen-phrases" class="screen">
+  <div class="header">
+    <div class="icon">💡</div>
+    <h1>Ключевые идеи</h1>
+    <p>Отредактируйте фразы — они станут заголовками слайдов</p>
+  </div>
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="final-badge">✨ Последний слайд: «Подробности ищите в описании»</div>
+  <div class="label">Фразы для карусели</div>
+  <div class="phrases-list" id="phrases-list"></div>
+  <button class="add-phrase-btn" onclick="addPhrase()">＋ Добавить фразу</button>
+  <div id="phrases-error" class="error-box" style="display:none;"></div>
+  <div class="mt-auto mt-16">
+    <button class="btn btn-gradient" onclick="generateImages()">🎨 Создать карусель</button>
+    <button class="btn btn-secondary mt-8" onclick="showScreen('screen-text')">← Изменить текст</button>
+  </div>
+</div>
+
+<!-- Screen 4: Generating -->
+<div id="screen-loading-generate" class="screen">
+  <div class="loading-screen">
+    <div class="spinner"></div>
+    <div style="text-align:center;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Генерируем изображения</div>
+      <div id="gen-status" style="font-size:14px;color:var(--hint);margin-bottom:16px;">Готовим стиль...</div>
+      <div class="progress-track">
+        <div class="progress-bar" id="gen-progress" style="width:0%"></div>
+      </div>
+      <div id="gen-count" style="font-size:12px;color:var(--hint);margin-top:8px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 5: Gallery -->
+<div id="screen-gallery" class="screen">
+  <div class="header">
+    <div class="icon">🎉</div>
+    <h1>Готово!</h1>
+    <p>Ваша карусель для Instagram</p>
+  </div>
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+  </div>
+  <button class="download-all-btn" onclick="downloadAll()">⬇️ Скачать все изображения</button>
+  <div class="gallery" id="gallery"></div>
+  <div class="info-box">💡 Нажмите на изображение, чтобы скачать его отдельно</div>
+  <div class="mt-auto">
+    <button class="btn btn-secondary" onclick="startNew()">＋ Создать новую карусель</button>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://n8n.aist.me/webhook';
+const tg = window.Telegram && window.Telegram.WebApp;
+
+var state = {
+  userId: null,
+  sessionId: null,
+  phrases: [],
+  postText: '',
+  images: []
+};
+
+// Init
+(function init() {
+  if (tg) { tg.ready(); tg.expand(); }
+
+  var userData = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || { id: 0, username: 'dev', first_name: 'User' };
+
+  fetch(API_BASE + '/carousel/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ telegram_id: userData.id, username: userData.username || '', first_name: userData.first_name || '' })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d.success) state.userId = d.user.id;
+  }).catch(function(e) { console.error('Register error:', e); });
+})();
+
+document.getElementById('post-text').addEventListener('input', function() {
+  document.getElementById('char-count').textContent = this.value.length + ' символов';
+});
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function extractIdeas() {
+  var text = document.getElementById('post-text').value.trim();
+  var errorEl = document.getElementById('text-error');
+  errorEl.style.display = 'none';
+
+  if (text.length < 20) {
+    errorEl.textContent = 'Введите текст поста (минимум 20 символов)';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  document.getElementById('extract-btn').disabled = true;
+  showScreen('screen-loading-extract');
+  state.postText = text;
+
+  var userData = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || { id: 0 };
+
+  fetch(API_BASE + '/carousel/extract-ideas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ telegram_id: userData.id, post_text: text })
+  }).then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data) {
+    if (!data.success) throw new Error(data.error || 'Ошибка сервера');
+    state.sessionId = data.session_id;
+    state.phrases = data.phrases || [];
+    renderPhrases();
+    showScreen('screen-phrases');
+  }).catch(function(e) {
+    showScreen('screen-text');
+    errorEl.textContent = 'Ошибка: ' + e.message;
+    errorEl.style.display = 'block';
+  }).finally(function() {
+    document.getElementById('extract-btn').disabled = false;
+  });
+}
+
+function renderPhrases() {
+  var list = document.getElementById('phrases-list');
+  while (list.firstChild) list.removeChild(list.firstChild);
+
+  state.phrases.forEach(function(phrase, i) {
+    var item = document.createElement('div');
+    item.className = 'phrase-item';
+
+    var num = document.createElement('span');
+    num.className = 'phrase-number';
+    num.textContent = i + 1;
+
+    var input = document.createElement('input');
+    input.className = 'phrase-input';
+    input.type = 'text';
+    input.value = phrase;
+    input.placeholder = 'Введите фразу...';
+    (function(idx) {
+      input.addEventListener('input', function() { state.phrases[idx] = this.value; });
+    })(i);
+
+    var del = document.createElement('button');
+    del.className = 'phrase-del';
+    del.textContent = '×';
+    del.title = 'Удалить';
+    (function(idx) {
+      del.addEventListener('click', function() { deletePhrase(idx); });
+    })(i);
+
+    item.appendChild(num);
+    item.appendChild(input);
+    item.appendChild(del);
+    list.appendChild(item);
+  });
+}
+
+function addPhrase() {
+  if (state.phrases.length >= 10) {
+    showPhraseError('Максимум 10 фраз');
+    return;
+  }
+  state.phrases.push('');
+  renderPhrases();
+  var inputs = document.querySelectorAll('.phrase-input');
+  if (inputs.length > 0) inputs[inputs.length - 1].focus();
+}
+
+function deletePhrase(i) {
+  if (state.phrases.length <= 1) {
+    showPhraseError('Должна быть хотя бы одна фраза');
+    return;
+  }
+  state.phrases.splice(i, 1);
+  renderPhrases();
+}
+
+function showPhraseError(msg) {
+  var el = document.getElementById('phrases-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function generateImages() {
+  var phrases = state.phrases.filter(function(p) { return p.trim().length > 0; });
+  var errorEl = document.getElementById('phrases-error');
+  errorEl.style.display = 'none';
+
+  if (phrases.length < 1) {
+    showPhraseError('Добавьте хотя бы одну фразу');
+    return;
+  }
+
+  var total = phrases.length + 1;
+  showScreen('screen-loading-generate');
+
+  var progressInterval = startProgressSimulation(total);
+
+  fetch(API_BASE + '/carousel/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      session_id: state.sessionId,
+      phrases: phrases,
+      original_text: state.postText || ''
+    })
+  }).then(function(r) {
+    clearInterval(progressInterval);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data) {
+    if (!data.success) throw new Error(data.error || 'Ошибка генерации');
+    state.images = data.images || [];
+    updateGenProgress(total, total, 'Готово!');
+    setTimeout(function() {
+      renderGallery();
+      showScreen('screen-gallery');
+    }, 500);
+  }).catch(function(e) {
+    clearInterval(progressInterval);
+    showScreen('screen-phrases');
+    showPhraseError('Ошибка генерации: ' + e.message);
+  });
+}
+
+function startProgressSimulation(total) {
+  var current = 0;
+  return setInterval(function() {
+    if (current < total - 1) {
+      current += 0.25;
+      var pct = Math.min(88, (current / total) * 100);
+      document.getElementById('gen-progress').style.width = pct + '%';
+      document.getElementById('gen-count').textContent = Math.floor(current) + ' / ' + total;
+      var step = Math.floor(current);
+      if (step > 0) {
+        document.getElementById('gen-status').textContent = 'Генерируем слайд ' + step + ' из ' + total + '...';
+      }
+    }
+  }, 2500);
+}
+
+function updateGenProgress(current, total, status) {
+  var pct = total > 0 ? (current / total) * 100 : 0;
+  document.getElementById('gen-progress').style.width = pct + '%';
+  document.getElementById('gen-count').textContent = current + ' / ' + total;
+  document.getElementById('gen-status').textContent = status;
+}
+
+function renderGallery() {
+  var gallery = document.getElementById('gallery');
+  while (gallery.firstChild) gallery.removeChild(gallery.firstChild);
+
+  state.images.forEach(function(img, i) {
+    var isFinal = i === state.images.length - 1;
+    var item = document.createElement('div');
+    item.className = 'gallery-item' + (isFinal ? ' final-slide' : '');
+
+    (function(imgRef, idx) {
+      item.addEventListener('click', function() { downloadImage(imgRef, idx); });
+    })(img, i);
+
+    if (img.image_data) {
+      var imgEl = document.createElement('img');
+      imgEl.src = img.image_data;
+      imgEl.alt = 'Слайд ' + (i + 1);
+      imgEl.loading = 'lazy';
+
+      var label = document.createElement('div');
+      label.className = 'phrase-label';
+      label.textContent = img.phrase || '';
+
+      item.appendChild(imgEl);
+      item.appendChild(label);
+    } else {
+      var placeholder = document.createElement('div');
+      placeholder.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;padding:10px;text-align:center;color:var(--hint);';
+      var warn = document.createElement('span');
+      warn.style.fontSize = '24px';
+      warn.textContent = '⚠️';
+      var pText = document.createElement('span');
+      pText.style.fontSize = '11px';
+      pText.textContent = img.phrase || 'Ошибка генерации';
+      placeholder.appendChild(warn);
+      placeholder.appendChild(pText);
+      item.appendChild(placeholder);
+    }
+
+    gallery.appendChild(item);
+  });
+}
+
+function downloadImage(img, index) {
+  if (!img.image_data) return;
+  var a = document.createElement('a');
+  a.href = img.image_data;
+  a.download = 'carousel-slide-' + (index + 1) + '.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function downloadAll() {
+  var validImages = state.images.filter(function(img) { return img.image_data; });
+  if (validImages.length === 0) { alert('Нет изображений для скачивания'); return; }
+  validImages.forEach(function(img, i) {
+    setTimeout(function() { downloadImage(img, i); }, i * 300);
+  });
+}
+
+function startNew() {
+  state = { userId: state.userId, sessionId: null, phrases: [], postText: '', images: [] };
+  document.getElementById('post-text').value = '';
+  document.getElementById('char-count').textContent = '0 символов';
+  showScreen('screen-text');
+}
+</script>
+</body>
+</html>
