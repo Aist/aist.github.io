@@ -367,9 +367,9 @@ function generateImages() {
 
   var total = phrases.length + 1;
   showScreen('screen-loading-generate');
-  updateGenProgress(0, total, 'Запускаем генерацию...');
 
-  // Step 1: POST /generate — returns immediately with session_id
+  var progressInterval = startProgressSimulation(total);
+
   fetch(API_BASE + '/carousel/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -379,56 +379,22 @@ function generateImages() {
       original_text: state.postText || ''
     })
   }).then(function(r) {
+    clearInterval(progressInterval);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }).then(function(data) {
-    if (!data.success) throw new Error(data.error || 'Ошибка запуска');
-    var sessionId = data.session_id || state.sessionId;
-    // Step 2: Poll /session until status = 'done'
-    pollSession(sessionId, total, 0);
+    if (!data.success) throw new Error(data.error || 'Ошибка генерации');
+    state.images = data.images || [];
+    updateGenProgress(total, total, 'Готово!');
+    setTimeout(function() {
+      renderGallery();
+      showScreen('screen-gallery');
+    }, 500);
   }).catch(function(e) {
+    clearInterval(progressInterval);
     showScreen('screen-phrases');
     showPhraseError('Ошибка генерации: ' + e.message);
   });
-}
-
-function pollSession(sessionId, total, attempt) {
-  var MAX_ATTEMPTS = 60; // 60 × 3s = 3 minutes max
-  if (attempt >= MAX_ATTEMPTS) {
-    showScreen('screen-phrases');
-    showPhraseError('Превышено время ожидания. Попробуйте ещё раз.');
-    return;
-  }
-
-  // Animate progress based on attempt count (roughly 3s per image)
-  var estimated = Math.min(total - 1, attempt * total / 20);
-  var pct = Math.min(90, (estimated / total) * 100);
-  var slide = Math.floor(estimated) + 1;
-  document.getElementById('gen-progress').style.width = pct + '%';
-  document.getElementById('gen-count').textContent = Math.min(slide, total) + ' / ' + total;
-  document.getElementById('gen-status').textContent = 'Генерируем слайд ' + Math.min(slide, total) + ' из ' + total + '...';
-
-  setTimeout(function() {
-    fetch(API_BASE + '/carousel/session?id=' + sessionId)
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        var session = data.session || {};
-        if (session.status === 'done') {
-          var images = session.image_data || [];
-          state.images = Array.isArray(images) ? images : [];
-          updateGenProgress(total, total, 'Готово!');
-          setTimeout(function() {
-            renderGallery();
-            showScreen('screen-gallery');
-          }, 400);
-        } else {
-          pollSession(sessionId, total, attempt + 1);
-        }
-      })
-      .catch(function() {
-        pollSession(sessionId, total, attempt + 1);
-      });
-  }, 3000);
 }
 
 function updateGenProgress(current, total, status) {
