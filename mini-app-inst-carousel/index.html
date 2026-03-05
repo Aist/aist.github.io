@@ -379,8 +379,10 @@ function generateImages() {
       original_text: state.postText || ''
     })
   }).then(function(r) {
-    clearInterval(progressInterval);
     if (!r.ok) throw new Error('HTTP ' + r.status);
+    // Generation done — now parsing large response
+    clearInterval(progressInterval);
+    updateGenProgress(total, total, 'Загружаем изображения...');
     return r.json();
   }).then(function(data) {
     if (!data.success) throw new Error(data.error || 'Ошибка генерации');
@@ -389,7 +391,7 @@ function generateImages() {
     setTimeout(function() {
       renderGallery();
       showScreen('screen-gallery');
-    }, 500);
+    }, 300);
   }).catch(function(e) {
     clearInterval(progressInterval);
     showScreen('screen-phrases');
