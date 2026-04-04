@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Политика конфиденциальности — VoiceRound</title>
+  <style>
+    :root {
+      --bg: #faf9f7;
+      --text: #1a1a1a;
+      --text-muted: #5c5c5c;
+      --accent: #6366f1;
+      --border: #e5e3e0;
+      --card: #fff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 0.25rem 0;
+      color: var(--text);
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .lang-switch {
+      margin-top: 1rem;
+    }
+    .lang-switch button {
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 6px;
+      color: var(--text-muted);
+    }
+    .lang-switch button.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .lang-switch button + button { margin-left: 0.5rem; }
+    section {
+      display: none;
+      animation: fade 0.2s ease;
+    }
+    section.active { display: block; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 1.75rem 0 0.75rem 0;
+      color: var(--text);
+    }
+    h2:first-of-type { margin-top: 0; }
+    p, ul {
+      margin: 0 0 0.75rem 0;
+      color: var(--text);
+    }
+    ul { padding-left: 1.25rem; }
+    li { margin-bottom: 0.35rem; }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    strong { font-weight: 600; }
+    .back {
+      display: inline-block;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .back:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Политика конфиденциальности</h1>
+      <p class="subtitle">VoiceRound — таймер отдыха на голосовых командах</p>
+      <div class="lang-switch">
+        <button id="lang-ru" class="active">Русский</button>
+        <button id="lang-en">English</button>
+      </div>
+    </header>
+
+    <section id="content-ru" class="active">
+      <p><em>Последнее обновление: апрель 2025</em></p>
+
+      <h2>1. Общие положения</h2>
+      <p>VoiceRound («мы», «приложение») — приложение для управления отдыхом между подходами с помощью голосовых команд. Мы уважаем вашу конфиденциальность и описываем ниже, какие данные собираются и как используются.</p>
+
+      <h2>2. Данные, хранящиеся только на устройстве</h2>
+      <p>Следующие данные <strong>не передаются</strong> никуда и хранятся только на вашем iPhone:</p>
+      <ul>
+        <li><strong>Ключевое слово</strong> — слово или фраза, которые вы выбираете для запуска таймера.</li>
+        <li><strong>Настройки тренировки</strong> — время отдыха, история сессий и другие параметры.</li>
+        <li><strong>История использования</strong> — данные о прошлых тренировках сохраняются только на вашем устройстве.</li>
+      </ul>
+      <p>Эти данные удаляются при удалении приложения.</p>
+
+      <h2>3. Распознавание речи</h2>
+      <p><strong>Все распознавание речи происходит локально на вашем iPhone.</strong> Ваше ключевое слово:</p>
+      <ul>
+        <li><strong>Не записывается</strong> на сервер и не сохраняется</li>
+        <li><strong>Не передается</strong> никуда</li>
+        <li><strong>Не анализируется</strong> третьими лицами</li>
+        <li><strong>Обрабатывается в реальном времени</strong> с использованием встроенной техники распознавания iOS</li>
+      </ul>
+
+      <h2>4. Доступ к микрофону</h2>
+      <p>Микрофон используется <strong>только для распознавания вашего ключевого слова</strong> в момент использования приложения. Звук обрабатывается локально и <strong>не отправляется на серверы</strong>.</p>
+
+      <h2>5. Аналитика</h2>
+      <p>Приложение собирает <strong>неличную аналитику</strong> через Firebase (сервис Google) для улучшения качества и понимания использования приложения:</p>
+      <ul>
+        <li><strong>События использования</strong> — какие функции используются и как часто</li>
+        <li><strong>Отчёты о крашах</strong> — информация об ошибках приложения</li>
+        <li><strong>Производительность</strong> — данные о скорости и стабильности</li>
+      </ul>
+      <p>Эти данные <strong>не содержат</strong> личную информацию (имя, номер телефона, почту или ваши ключевые слова). Данные защищены согласно <a href="https://policies.google.com/privacy">Политике конфиденциальности Google</a>.</p>
+
+      <h2>6. Реклама и покупки</h2>
+      <p>В приложении <strong>нет рекламы</strong> и <strong>нет покупок внутри приложения</strong>.</p>
+
+      <h2>7. Передача данных третьим лицам</h2>
+      <p>Мы передаём неличную аналитику и информацию об ошибках в Google Firebase для анализа и улучшения приложения. <strong>Мы не продаём и не передаём ваши личные данные</strong> третьим лицам.</p>
+
+      <h2>8. Ваши права</h2>
+      <ul>
+        <li><strong>Удалить данные</strong> — удалите приложение, чтобы удалить все локальные данные.</li>
+        <li><strong>Отзвать доступ к микрофону</strong> — вы можете отозвать доступ приложения к микрофону в настройках iOS.</li>
+      </ul>
+
+      <h2>9. Изменения политики</h2>
+      <p>Мы можем обновлять эту политику. О существенных изменениях будет сообщено в приложении или на этой странице.</p>
+
+      <h2>10. Контакты</h2>
+      <p>По вопросам конфиденциальности: <a href="mailto:aistweb@gmail.com">aistweb@gmail.com</a></p>
+    </section>
+
+    <section id="content-en">
+      <p><em>Last updated: April 2025</em></p>
+
+      <h2>1. Introduction</h2>
+      <p>VoiceRound is an application for managing rest between sets using voice commands. We respect your privacy and describe below what data we collect and how we use it.</p>
+
+      <h2>2. Data Stored Only on Your Device</h2>
+      <p>The following data is <strong>not transmitted</strong> anywhere and is stored only on your iPhone:</p>
+      <ul>
+        <li><strong>Keyword</strong> — the word or phrase you choose to start the timer.</li>
+        <li><strong>Workout settings</strong> — rest duration, session history, and other parameters.</li>
+        <li><strong>Usage history</strong> — data about past workouts is stored only on your device.</li>
+      </ul>
+      <p>This data is deleted when you uninstall the app.</p>
+
+      <h2>3. Speech Recognition</h2>
+      <p><strong>All speech recognition happens locally on your iPhone.</strong> Your keyword:</p>
+      <ul>
+        <li><strong>Is not recorded</strong> to any server</li>
+        <li><strong>Is not transmitted</strong> anywhere</li>
+        <li><strong>Is not analyzed</strong> by third parties</li>
+        <li><strong>Is processed in real-time</strong> using iOS's built-in speech recognition technology</li>
+      </ul>
+
+      <h2>4. Microphone Access</h2>
+      <p>The microphone is used <strong>only to recognize your keyword</strong> while using the app. Audio is processed locally and <strong>is never sent</strong> to any servers.</p>
+
+      <h2>5. Analytics</h2>
+      <p>The app collects <strong>non-personal analytics</strong> through Firebase (Google's service) to improve quality and understand how the app is used:</p>
+      <ul>
+        <li><strong>Usage events</strong> — which features are used and how often</li>
+        <li><strong>Crash reports</strong> — information about app errors</li>
+        <li><strong>Performance data</strong> — information about speed and stability</li>
+      </ul>
+      <p>This data <strong>does not contain</strong> personal information (name, phone number, email, or your keywords). Data is protected according to <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</p>
+
+      <h2>6. Advertising and Purchases</h2>
+      <p>The app contains <strong>no advertising</strong> and <strong>no in-app purchases</strong>.</p>
+
+      <h2>7. Third-Party Sharing</h2>
+      <p>We share non-personal analytics and crash reports with Google Firebase for analysis and app improvement. <strong>We do not sell or share your personal data</strong> with third parties.</p>
+
+      <h2>8. Your Rights</h2>
+      <ul>
+        <li><strong>Delete data</strong> — uninstall the app to remove all local data.</li>
+        <li><strong>Revoke microphone access</strong> — you can revoke the app's microphone access in iOS settings.</li>
+      </ul>
+
+      <h2>9. Changes</h2>
+      <p>We may update this policy. Significant changes will be announced in the app or on this page.</p>
+
+      <h2>10. Contact</h2>
+      <p>For privacy-related questions: <a href="mailto:aistweb@gmail.com">aistweb@gmail.com</a></p>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById('lang-ru').onclick = function() {
+      document.getElementById('content-ru').classList.add('active');
+      document.getElementById('content-en').classList.remove('active');
+      this.classList.add('active');
+      document.getElementById('lang-en').classList.remove('active');
+    };
+    document.getElementById('lang-en').onclick = function() {
+      document.getElementById('content-en').classList.add('active');
+      document.getElementById('content-ru').classList.remove('active');
+      this.classList.add('active');
+      document.getElementById('lang-ru').classList.remove('active');
+    };
+  </script>
+</body>
+</html>
